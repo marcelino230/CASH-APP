@@ -1,0 +1,295 @@
+<?php
+switch ($_GET['act']) {
+      
+  // PROSES VIEW DATA LAPORAN PENJUALAN //      
+      
+   case 'view':
+?>
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Laporan Penjualan</h1>
+            <ol class="breadcrumb">
+              <li><a href="#"><i class="fa fa-dashboard"></i> Beranda</a></li>
+              <li><a href="?pg=lappj&act=view"><i class="fa fa-dashboard"></i> Laporan Penjualan</a></li>
+             </ol>
+        </section>
+
+<section class="content">
+  <div class="row">
+  <div class="col-md-3">
+  <form action="?pg=lappj&act=cek" method="POST">
+      <div class="form-group">
+      <label for="exampleInputEmail1">Tanggal Penjualan Awal</label>
+      <input class="form-control" id="date" name="tglpenjualanaw" placeholder="MM/DD/YYY" type="text"/>
+      </div>
+  </div>
+  <div class="col-md-3">
+      <div class="form-group">
+      <label for="exampleInputEmail1">Tanggal Penjualan Akhir</label>
+      <input class="form-control" id="date" name="tglpenjualanak" placeholder="MM/DD/YYY" type="text"/>
+      </div>
+  </div>
+  
+  <div class="col-md-3">
+      <div class="form-group">
+      <label for="exampleInputEmail1">Mulai Pencarian</label><br>
+      <input type="submit" value="Pencarian" class="btn btn-primary">
+      </div>
+  </div>
+  </form>
+
+  <div class="col-md-12">
+              <!-- general form elements -->
+              <div class="box box-primary">
+                  <div class="box-body">
+                  <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>No Penjualan</th>
+                        <th>Tanggal Penjualan</th>
+                        <th>pengunjung</th>
+                        <th>Total Penjualan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                   
+                      while ($r=mysqli_fetch_array($tampil)){
+                    ?>
+                        <tr>
+                        <td><?php echo "$no"?></td>
+                        <td><?php echo "$r[nopenjualan]"?></td>
+
+                        <?php 
+                        $tglpenjualan=tgl_indo($r['tglpenjualan']);?>
+                        
+                        <td><?php echo "$tglpenjualan"?></td>
+                        <td><?php echo "$r[nmpengunjung]"?></td>
+                        <td><?php echo "Rp.$r[total_penjualan],-"?></td>
+                        </tr>
+
+                    <?php
+                    $no++;
+                    }
+                    ?>
+
+                    <tr>
+                    <td align = "center" colspan="6"> <span style="font-weight:bold">TOTAL</span></td>
+                    <?php
+                    /*
+                    $liatHarga=mysql_fetch_array(mysql_query("SELECT sum(harga) as harga, 
+                    sum(isv_sales) as isv_sales,sum(isv_mgr) as isv_mgr,
+                    sum(isv_spv) as isv_spv,sum(isv_ptgs) as isv_ptgs
+                    FROM tblrealisasi r join tblproduk p on (r.id_produk=p.id_produk) 
+                    order by nopenjualan asc"));
+                    */
+                    ?>
+
+                    <td><span style="font-weight:bold"><?php echo "Rp.$liatHarga[harga],-"?></td>
+                    <td><span style="font-weight:bold"><?php echo "Rp.$liatHarga[isv_sales],-"?></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                  </div><!-- /.box-body -->
+              </div>
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+  </div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+</div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+<?php
+break;
+
+  case 'cek':
+  // menampilkan pertanyaan pertama
+  $sqlp = "SELECT * FROM tblrealisasi r JOIN tblpengunjung s ON ( s.id_pengunjung = r.id_pengunjung ) 
+           WHERE tglpenjualan BETWEEN  '$_POST[tglpenjualanaw]' AND  '$_POST[tglpenjualanak]'
+          
+           ORDER BY nopenjualan ASC";
+
+  $rs=mysqli_query($GLOBALS["___mysqli_ston"], $sqlp);
+  $data=mysqli_fetch_array($rs);
+
+  if (!(empty($data))){
+    ?>
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Laporan Penjualan</h1>
+            <ol class="breadcrumb">
+              <li><a href="#"><i class="fa fa-dashboard"></i> Beranda</a></li>
+              <li><a href="?pg=lappj&act=view"><i class="fa fa-dashboard"></i> Laporan Penjualan</a></li>
+             </ol>
+        </section>
+
+    <section class="content">
+      <div class="row">
+      <div class="col-md-3">
+      <form action="?pg=lappj&act=cek" method="POST">
+          <div class="form-group">
+          <label for="exampleInputEmail1">Tanggal Penjualan Awal</label>
+          <input class="form-control" id="date" name="tglpenjualanaw" placeholder="MM/DD/YYY" type="text"/>
+          </div>
+      </div>
+      <div class="col-md-3">
+          <div class="form-group">
+          <label for="exampleInputEmail1">Tanggal Penjualan Akhir</label>
+          <input class="form-control" id="date" name="tglpenjualanak" placeholder="MM/DD/YYY" type="text"/>
+          </div>
+      </div>
+      
+      <div class="col-md-3">
+          <div class="form-group">
+          <label for="exampleInputEmail1">Mulai Pencarian</label><br>
+          <input type="submit" value="Pencarian" class="btn bg-orange">
+          </div>
+      </div>
+      </form>
+
+      <div class="col-md-12">
+                  <!-- general form elements -->
+                  <div class="box box-primary">
+                      <div class="box-body">
+                      <div class="table-responsive">
+                      <table class="table table-hover responsive">
+                        <thead>
+                          <tr>
+                            <th>No</th>
+                            <th>No Penjualan</th>
+                            <th>Tanggal Penjualan</th>
+                            <th>pengunjung</th>
+                            <th>Total Penjualan</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        $tampil=mysqli_query($GLOBALS["___mysqli_ston"], "SELECT * FROM tblrealisasi r JOIN tblpengunjung s ON ( s.id_pengunjung = r.id_pengunjung ) 
+                        WHERE tglpenjualan BETWEEN  '$_POST[tglpenjualanaw]' AND  '$_POST[tglpenjualanak]'
+                        ORDER BY nopenjualan ASC");
+                        $no = 1;
+                          while ($r=mysqli_fetch_array($tampil)){
+                        ?>
+                            <tr>
+                            <td><?php echo "$no"?></td>
+                            <td><?php echo "$r[nopenjualan]"?></td>
+
+                            <?php 
+                            $tglpenjualan=tgl_indo($r['tglpenjualan']);?>
+                            
+                            <td align="center"><?php echo "$tglpenjualan"?></td>
+                            <td align="center"><?php echo "$r[nmpengunjung]"?></td>
+                            <td align="center"><?php echo "Rp.". number_format("$r[total_penjualan]",'0','.','.')?></td>
+                            </tr>
+
+                        <?php
+                        $no++;
+                        }
+                        ?>
+
+                        <tr>
+                        <td align = "center" colspan="4"> <span style="font-weight:bold">TOTAL</span></td>
+                        <?php
+                        
+                        $liatHarga=mysqli_fetch_array(mysqli_query($GLOBALS["___mysqli_ston"], "SELECT sum(total_penjualan) as total_penjualan FROM tblrealisasi
+                       
+                        where  tglpenjualan BETWEEN '$_POST[tglpenjualanaw]' AND  '$_POST[tglpenjualanak]'
+                       
+                        ORDER BY nopenjualan ASC"));
+                        ?>
+
+                        <td><span style="font-weight:bold"><?php echo "Rp.". number_format("$liatHarga[total_penjualan]",'0','.','.')?></td>
+                        
+                        </tr>
+                        </tbody>
+                      </table>
+                      </div><!-- /.box-body -->
+                  </div>
+                  </div><!-- /.box -->
+                  </div> <!-- /.col -->
+      </div>
+        <!-- /.row (main row) -->
+
+      <div class="row">
+              <div class="col-md-2 col-md-offset-5">
+              <form role="form" action="cetak_pdf.php" method="POST" target="_blank">
+              <div class="box-body">
+                  <div class="form-group">
+                  <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-file-pdf-o">   Cetak Laporan Penjualan Tiket Masuk </i>  
+                  </button>
+                  </div>
+                  <div class="form-group">
+                  <input type="hidden" class="form-control" id="tglpenjualanaw" name="tglpenjualanaw" placeholder="Nama pengunjung" value= "<?php echo $_POST['tglpenjualanaw']?>">
+                  <input type="hidden" class="form-control" id="tglpenjualanak" name="tglpenjualanak" placeholder="Nama pengunjung" value= "<?php echo $_POST['tglpenjualanak']?>">
+                  <input type="hidden" class="form-control" id="nmkaryawan" name="nmkaryawan" placeholder="Nama Karyawan" value= "<?php echo $_POST['nmkaryawan']?>">
+                  </div>
+              </form>
+
+              
+
+          </div>
+
+          </div>
+           <div class="col-md-2 col-md-offset-2">
+              <form role="form" action="cetak_jurnal.php" method="POST" target="_blank">
+              <div class="box-body">
+                  <div class="form-group">
+                  <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-file-pdf-o">   Cetak Jurnal Buku Besar</i>  
+                  </button>
+                  </div>
+                  <div class="form-group">
+                  <input type="hidden" class="form-control" id="tglpenjualanaw" name="tglpenjualanaw" placeholder="Nama Konsumen" value= "<?php echo $_POST['tglpenjualanaw']?>">
+                  <input type="hidden" class="form-control" id="tglpenjualanak" name="tglpenjualanak" placeholder="Nama Konsumen" value= "<?php echo $_POST['tglpenjualanak']?>">
+                  </div>
+              </form>
+          </div>
+          </div>
+
+    </section> <!-- /.content -->
+    </div><!-- /.container -->
+    </div><!-- /.content-wrapper -->
+
+<?php
+} else { 
+  ?>
+  <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <section class="content-header">
+      <h1> Silahkan pilih</h1>
+            <ol class="breadcrumb">
+              <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+              <li><a href="?pg=lappj&act=view"><i class="fa fa-dashboard"></i> laporan Penjualan</a></li>
+             </ol>
+      </section>
+
+      <section class="content">
+          <div class="box box-success">
+              <div class="box-body">
+                  <div class="form-group">
+                  <?php
+                  echo " <p> Maaf untuk pencarian yang anda cari tidak tersedia. <br>
+                  Silahkan coba lakukan pencarian ulang. Terima Kasih </p>";
+                  
+                  ?>
+                  </div>
+              </div>
+          </div>
+      </section> <!-- /.content -->
+    </div> <!-- /.container -->
+  </div> <!-- /.content-wrapper -->
+
+  <?php
+  }
+  ?>
+
+<?php
+break;
+}
+?>

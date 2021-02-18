@@ -1,0 +1,381 @@
+<?php
+//if(empty($_SESSION['username'])){
+//    echo "Not found!";
+//} else {
+    switch ($_GET['act']) {
+    // PROSES VIEW DATA KARYAWAN //      
+      case 'view':
+      ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Karyawan </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=krywn&act=view">Data Karyawan</a></li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="row">
+		<div class="col-md-12">
+    <div class="box-header">
+    <a href="?pg=krywn&act=add"> <button type="button" class="btn btn-primary"><i class = "fa fa-plus"> Tambah Data </i></button> </a>
+    </div><!-- /.box-header -->
+              <!-- general form elements -->
+              <div class="box box-primary">
+                  <div class="box-body">
+                  <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Nama Karyawan</th>
+                        <th>jenis Kelamin</th>
+                        <th>Pendidikan</th>
+                        <th>Jabatan</th>
+                        <th>Tanggal Masuk Kerja</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $tampil=mysql_query("SELECT * FROM tblkaryawan k join level_user l
+                    on (k.id_level=l.id_level) join tblpendidikan p on (k.id_pendidikan=p.id_pendidikan) 
+                    order by id_karyawan asc");
+                    $no = 1;
+                      while ($r=mysql_fetch_array($tampil)){
+                    ?>
+                        <tr>
+                        <td><?php echo "$no"?></td>
+                        <td><?php echo "$r[nmkaryawan]"?></td>
+                        
+                        <?php
+                        if ($r['jenkel']=="L"){
+                          $jenkel = "Laki-laki";
+                        } else {
+                          $jenkel = "Perempuan";
+                        }
+                        ?>
+
+                        <td><?php echo "$jenkel"?></td>
+                        <td><?php echo "$r[pendidikan]"?></td>
+                        <td><?php echo "$r[level]"?></td>
+                        
+                        <?php 
+                        $tgl_masuk_kerja=tgl_indo($r['tgl_masuk_kerja']);?>
+
+                        <td><?php echo "$tgl_masuk_kerja"?></td>
+                        <td><a href="?pg=krywn&act=edit&id=<?php echo $r['id_karyawan']?>"><button type="button" class="btn bg-orange"><i class="fa fa-pencil-square-o"></i></button></a></td>
+                        <td><a href="?pg=krywn&act=delete&id=<?php echo $r['id_karyawan']?>"><button type="button" class="btn btn-primary" onclick="return confirm('Apakah anda yakin akan menghapusnya?');"><i class = "fa fa-trash-o"></i></button></a></td>
+                        </tr>
+
+                    <?php
+                    $no++;
+                    }
+                    ?>
+                    </tbody>
+                  </table>
+                  </div><!-- /.box-body -->
+              </div>
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+	</div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+      <?php
+      break;
+      // PROSES TAMBAH DATA KARYAWAN //
+      case 'add':
+      if (isset($_POST['add'])) {
+                $query = mysql_query("INSERT INTO tblkaryawan VALUES ('','$_POST[jabatan]',
+                '$_POST[nmkaryawan]','$_POST[tgl_lahir]','$_POST[jenkel]',
+                '$_POST[pendidikan]','$_POST[alamat]','$_POST[tgl_masuk_kerja]','$_POST[contact]')");
+                echo "<script>window.location='home.php?pg=krywn&act=view'</script>";
+              }
+              ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Pengguna </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=krywn&act=view">Data Karyawan</a></li>
+            <li class="active"><a href="#">Tambah Data Karyawan</a></li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-md-12">
+              <!-- general form elements -->
+              <div class="box box-success">
+                  <div class="box-body">
+                  <!-- form start -->
+                <form role="form" method = "POST" action="">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Nama Karyawan</label>
+                      <input type="text" class="form-control" id="nmkaryawan" name="nmkaryawan" placeholder="Nama Karyawan" required data-fv-notempty-message="Tidak boleh kosong">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Lahir</label>
+                      <input class="form-control" id="date" name="tgl_lahir" placeholder="MM/DD/YYY" type="text"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">jenis Kelamin</label> <br>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="L" required data-fv-notempty-message="Tidak boleh kosong"> Laki-laki 
+                      </label>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="P" required data-fv-notempty-message="Tidak boleh kosong"> Perempuan
+                      </label>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Pendidikan</label>
+                      <select class="form-control select2" name="pendidikan" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Pendidikan Terakhir ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM tblpendidikan ORDER BY id_pendidikan");
+                      while($r=mysql_fetch_array($tampil)){
+                      ?>
+                      <option value="<?php echo $r['id_pendidikan']?>"><?php echo $r['pendidikan'] ?></option>
+                      <?php
+                    }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Jabatan</label>
+                      <select class="form-control select2" name="jabatan" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Jabatan ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM level_user where level not like 'admin%' ORDER BY id_level");
+                      while($r=mysql_fetch_array($tampil)){
+                      ?>
+                      <option value="<?php echo $r['id_level']?>"><?php echo $r['level'] ?></option>
+                      <?php
+                    }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                    <label for="exampleInputEmail1">Alamat</label>
+                    <textarea class="form-control" name="alamat" rows="5" placeholder="Alamat" required data-fv-notempty-message="Tidak boleh kosong"></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Masuk Kerja</label>
+                      <input class="form-control" id="date" name="tgl_masuk_kerja" placeholder="MM/DD/YYY" type="text"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Contact Person</label>
+                      <input type="number" class="form-control" id="contact" name="contact" placeholder="Contact Person" required data-fv-notempty-message="Tidak boleh kosong">
+                    </div>
+                    
+                  </div><!-- /.box-body -->
+
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+
+              </div> <!-- /.row -->
+
+          
+            <!-- Tombol Bagian Bawah -->
+
+            <div class="row">
+            <!-- left column -->
+              <div class="col-md-4 col-md-offset-5">
+
+              <button type="submit" name = 'add' class="btn btn-primary">Simpan</button>
+              &nbsp;
+              <button type="reset" class="btn btn-success">Reset</button>
+                  
+            </form>
+                  </div><!-- /.box-body -->
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+  </div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+
+      <?php
+      break;
+      // PROSES EDIT DATA KARYAWAN //
+      case 'edit':
+      $d = mysql_fetch_array(mysql_query("SELECT * FROM tblkaryawan WHERE id_karyawan='$_GET[id]'"));
+            if (isset($_POST['update'])) {          
+              mysql_query("UPDATE tblkaryawan SET nmkaryawan='$_POST[nmkaryawan]',
+               tgllahir='$_POST[tgl_lahir]',jenkel='$_POST[jenkel]',id_pendidikan='$_POST[pendidikan]',
+               id_level='$_POST[jabatan]',alamat='$_POST[alamat]',
+               tgl_masuk_kerja='$_POST[tgl_masuk_kerja]',cperson='$_POST[contact]' 
+               WHERE id_karyawan='$_POST[id]'");
+                echo "<script>window.location='home.php?pg=krywn&act=view'</script>";            
+          }
+              ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Karyawan </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=krywn&act=view">Data Karyawan</a></li>
+            <li class="active">Update Data Karyawan</li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-md-12">
+              <!-- general form elements -->
+              <div class="box box-success">
+                  <div class="box-body">
+                  <!-- form start -->
+                <form role="form" method = "POST" action="">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Nama Karyawan</label>
+                      <input type="hidden" name="id" value= "<?php echo $d['id_karyawan'];?>">
+                      <input type="text" class="form-control" id="nmkaryawan" name="nmkaryawan" placeholder="Nama Karyawan" required data-fv-notempty-message="Tidak boleh kosong" value= "<?php echo $d['nmkaryawan'];?>">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Lahir</label>
+                      <input class="form-control" id="date" name="tgl_lahir" placeholder="MM/DD/YYY" type="text"/ value= "<?php echo $d['tgllahir'];?>">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Jenis Kelamin</label> <br>
+                      <?php
+                      if ($d['jenkel'] == 'L'){
+                      ?>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="L" required data-fv-notempty-message="Tidak boleh kosong" checked> Laki-laki 
+                      </label>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="P" required data-fv-notempty-message="Tidak boleh kosong"> Perempuan
+                      </label>
+                      <?php
+                      } else {
+                      ?>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="L" required data-fv-notempty-message="Tidak boleh kosong"> Laki-laki 
+                      </label>
+                      <label class="radio-inline">
+                      <input type="radio" name="jenkel" id="jenkel" value="P" required data-fv-notempty-message="Tidak boleh kosong" checked> Perempuan
+                      </label>
+                      <?php
+                      }
+                      ?>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Pendidikan</label>
+                      <select class="form-control select2" name="pendidikan" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Pendidikan Terakhir ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM tblpendidikan ORDER BY id_pendidikan");
+                      while($r=mysql_fetch_array($tampil)){
+                      if ($d['id_pendidikan']==$r['id_pendidikan']){
+                      ?>
+                      <option value="<?php echo $r['id_pendidikan']?>" selected><?php echo $r['pendidikan'] ?></option>
+                      <?php
+                    } else{
+                      ?>
+                      <option value="<?php echo $r['id_pendidikan']?>"><?php echo $r['pendidikan'] ?></option>
+                      <?php
+                    }
+                  }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Jabatan</label>
+                      <select class="form-control select2" name="jabatan" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Jabatan ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM level_user where level not like 'admin%' ORDER BY id_level");
+                      while($r=mysql_fetch_array($tampil)){
+                      if ($d['id_level']==$r['id_level']){
+                      ?>
+                      <option value="<?php echo $r['id_level']?>" selected><?php echo $r['level'] ?></option>
+                      <?php
+                    } else{
+                      ?>
+                      <option value="<?php echo $r['id_level']?>"><?php echo $r['level'] ?></option>
+                      <?php
+                    }
+                  }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                    <label for="exampleInputEmail1">Alamat</label>
+                    <textarea class="form-control" name="alamat" rows="5" placeholder="Alamat" required data-fv-notempty-message="Tidak boleh kosong"><?php echo $d[alamat]?></textarea>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Masuk Kerja</label>
+                      <input class="form-control" id="date" name="tgl_masuk_kerja" placeholder="MM/DD/YYY" type="text" value= "<?php echo $d['tgl_masuk_kerja'];?>"/>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Contact Person</label>
+                      <input type="number" class="form-control" id="contact" name="contact" placeholder="Contact Person" required data-fv-notempty-message="Tidak boleh kosong" value= "<?php echo $d['cperson'];?>">
+                    </div>
+                    
+                  </div><!-- /.box-body -->
+
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+
+              </div> <!-- /.row -->
+
+          
+            <!-- Tombol Bagian Bawah -->
+
+            <div class="row">
+            <!-- left column -->
+              <div class="col-md-4 col-md-offset-5">
+
+              <button type="submit" name = 'update' class="btn btn-primary">Update</button>
+              &nbsp;
+              <button type="reset" class="btn btn-success">Reset</button>
+                  
+            </form>
+                  </div><!-- /.box-body -->
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+  </div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+
+    <?php
+    break;
+
+    // PROSES HAPUS DATA KARYAWAN //
+      case 'delete':
+      mysql_query("DELETE FROM tblkaryawan WHERE id_karyawan='$_GET[id]'");
+      echo "<script>window.location='home.php?pg=krywn&act=view'</script>";
+      break;
+
+    }
+    ?>

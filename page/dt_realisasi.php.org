@@ -1,0 +1,336 @@
+<?php
+//if(empty($_SESSION['username'])){
+//    echo "Not found!";
+//} else {
+    switch ($_GET['act']) {
+    // PROSES VIEW DATA REALISASI //      
+      case 'view':
+      ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Realisasi </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=rls&act=view">Data Realisasi</a></li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="row">
+		<div class="col-md-12">
+    <div class="box-header">
+    <a href="?pg=rls&act=add"> <button type="button" class="btn btn-primary"><i class = "fa fa-plus"> Tambah Data </i></button> </a>
+    </div><!-- /.box-header -->
+              <!-- general form elements -->
+              <div class="box box-primary">
+                  <div class="box-body">
+                  <div class="table-responsive">
+                  <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Tanggal Penjualan</th>
+                        <th>Nama pengunjung</th>
+                        <th>Penjualan</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $tampil=mysql_query("SELECT * FROM tblrealisasi r  join tblpengunjung s 
+                    on (s.id_pengunjung=r.id_pengunjung) order by nopenjualan asc");
+                    $no = 1;
+                      while ($r=mysql_fetch_array($tampil)){
+                    ?>
+                        <tr>
+                        <td><?php echo "$no"?></td>
+
+                        <?php 
+                        $tglpenjualan=tgl_indo($r['tglpenjualan']);?>
+                        
+                        <td><?php echo "$tglpenjualan"?></td>
+                        <td><?php echo "$r[nmpengunjung]"?></td>
+                        <td><?php echo "Rp.". number_format("$r[total_penjualan]",'0','.','.')?></td>
+                        <td><a href="?pg=rls&act=edit&id=<?php echo $r['nopenjualan']?>"><button type="button" class="btn bg-orange"><i class="fa fa-pencil-square-o"></i></button></a></td>
+                        <td><a href="?pg=rls&act=delete&id=<?php echo $r['nopenjualan']?>"><button type="button" class="btn btn-primary" onclick="return confirm('Apakah anda yakin akan menghapusnya?');"><i class = "fa fa-trash-o"></i></button></a></td>
+                        </tr>
+
+                    <?php
+                    $no++;
+                    }
+                    ?>
+                    </tbody>
+                  </table>
+                  </div><!-- /.box-body -->
+              </div>
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+	</div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+      <?php
+      break;
+      // PROSES TAMBAH DATA REALISASI //
+      case 'add':
+      if (isset($_POST['add'])) {
+
+        $harga = $_POST[harga];
+        if ($harga >= 1000000){
+          $isv_sales = 5000;
+        } 
+        if ($harga >= 2000000){
+          $isv_sales = 10000;
+        } 
+        if ($harga >= 3000000){
+          $isv_sales = 20000;
+        } 
+        if ($harga >= 5000000){
+          $isv_sales = 25000;
+        } 
+        if ($harga >= 10000000){
+          $isv_sales = 30000;
+        }
+                $query = mysql_query("INSERT INTO tblrealisasi VALUES ('$_POST[nopenjualan]',
+                '$_POST[tglpenjualan]',
+                '$_POST[id_pengunjung]','$_POST[harga]','$isv_sales')");
+                echo "<script>window.location='home.php?pg=rls&act=view'</script>";
+              }
+              ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Realisasi </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=rls&act=view">Data Realisasi</a></li>
+            <li class="active"><a href="#">Tambah Data Realisasi</a></li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-md-12">
+              <!-- general form elements -->
+              <div class="box box-primary">
+                  <div class="box-body">
+                  <!-- form start -->
+                <form role="form" method = "POST" action="">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <?php
+                      //memulai mengambil datanya
+                      $sql = mysql_query("select * from tblrealisasi");
+                      
+                      $num = mysql_num_rows($sql);
+                      
+                      if($num <> 0)
+                      {
+                      $kode = $num + 1;
+                      }else
+                      {
+                      $kode = 1;
+                      }
+                      
+                      //mulai bikin kode
+                      $bikin_kode = str_pad($kode, 4, "0", STR_PAD_LEFT);
+                      $tahun = date('Ym');
+                      $kode_jadi = "FAKTUR$tahun$bikin_kode";
+
+                      ?>
+                      <label for="exampleInputEmail1">Nomor Penjualan</label>
+                      <input type="text" class="form-control" id="nopenj" name="nopenj" placeholder="Nomor Penjualan" value="<?php echo $kode_jadi?>" required data-fv-notempty-message="Tidak boleh kosong" disabled>
+                      <input type="hidden" class="form-control" id="nopenjualan" name="nopenjualan" placeholder="Nomor Penjualan" value="<?php echo $kode_jadi?>" required data-fv-notempty-message="Tidak boleh kosong">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Penjualan</label>
+                      <input class="form-control" id="date" name="tglpenjualan" placeholder="MM/DD/YYY" type="text"/>
+                    </div>
+                  
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Nama pengunjung</label>
+                      <select class="form-control select2" name="id_pengunjung" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Nama pengunjung ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM tblpengunjung ORDER BY id_pengunjung");
+                      while($r=mysql_fetch_array($tampil)){
+                      ?>
+                      <option value="<?php echo $r['id_pengunjung']?>"><?php echo $r['nmpengunjung'] ?></option>
+                      <?php
+                    }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Total Penjualan</label>
+                      <input type="number" class="form-control" id="harga" name="harga" placeholder="Total Penjualan" required data-fv-notempty-message="Tidak boleh kosong">
+                    </div>
+                    
+                  </div><!-- /.box-body -->
+
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+
+              </div> <!-- /.row -->
+
+          
+            <!-- Tombol Bagian Bawah -->
+
+            <div class="row">
+            <!-- left column -->
+              <div class="col-md-4 col-md-offset-5">
+
+              <button type="submit" name ='add' class="btn btn-primary">Simpan</button>
+              &nbsp;
+              <button type="reset" class="btn btn-success">Reset</button>
+                  
+            </form>
+                  </div><!-- /.box-body -->
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+  </div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+
+      <?php
+      break;
+      // PROSES EDIT DATA KARYAWAN //
+      case 'edit':
+      $d = mysql_fetch_array(mysql_query("SELECT * FROM tblrealisasi WHERE nopenjualan='$_GET[id]'"));
+            if (isset($_POST['update'])) {
+
+            $harga = $_POST[harga];
+            if ($harga >= 1000000){
+              $isv_sales = 5000;
+            } 
+            if ($harga >= 2000000){
+              $isv_sales = 10000;
+            } 
+            if ($harga >= 3000000){
+              $isv_sales = 20000;
+            } 
+            if ($harga >= 5000000){
+              $isv_sales = 25000;
+            } 
+            if ($harga >= 10000000){
+              $isv_sales = 30000;
+            }
+
+              mysql_query("UPDATE tblrealisasi SET tglpenjualan='$_POST[tglpenjualan]',id_pengunjung='$_POST[id_pengunjung]',
+               total_penjualan='$_POST[harga]',isv_sales='$isv_sales' WHERE nopenjualan='$_POST[id]'");
+                echo "<script>window.location='home.php?pg=rls&act=view'</script>";            
+          }
+              ?>
+
+<div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+        <h1> Data Realisasi </h1>
+            <ol class="breadcrumb">
+            <li><a href="?pg=dashboard"><i class="fa fa-dashboard"></i> Beranda</a></li>
+            <li class="active"><a href="?pg=rls&act=view">Data Realisasi</a></li>
+            <li class="active">Update Data Realisasi</li>
+             </ol>
+        </section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-md-12">
+              <!-- general form elements -->
+              <div class="box box-primary">
+                  <div class="box-body">
+                  <!-- form start -->
+                <form role="form" method = "POST" action="">
+                  <div class="box-body">
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Nomor Penjualan</label>
+                      <input type="text" class="form-control" id="nopenj" name="nopenj" placeholder="Nomor Penjualan" value= "<?php echo $d[nopenjualan];?>" required data-fv-notempty-message="Tidak boleh kosong" disabled>
+                      <input type="hidden" class="form-control" id="nopenjualan" name="nopenjualan" placeholder="Nomor Penjualan" value= "<?php echo $d[nopenjualan];?>" required data-fv-notempty-message="Tidak boleh kosong">
+                      <input type="hidden" name="id" value="<?php echo $d[nopenjualan]?>">
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Tanggal Penjualan</label>
+                      <input class="form-control" id="date" name="tglpenjualan" placeholder="MM/DD/YYY" type="text" value="<?php echo $d[tglpenjualan]?>"/>
+                    </div>
+                   
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Nama pengunjung</label>
+                      <select class="form-control select2" name="id_pengunjung" style="width: 100%;">
+                      <option value="">--- Silahkan Pilih ---</option>
+                      <optgroup label="--- Nama pengunjung ---">
+                      <?php
+                      $tampil=mysql_query("SELECT * FROM tblpengunjung ORDER BY id_pengunjung");
+                      while($r=mysql_fetch_array($tampil)){
+                      if ($d['id_pengunjung']==$r['id_pengunjung']){
+                      ?>
+                      <option value="<?php echo $r['id_pengunjung']?>" selected><?php echo $r['nmpengunjung'] ?></option>
+                      <?php
+                    } else{
+                      ?>
+                      <option value="<?php echo $r['id_pengunjung']?>"><?php echo $r['nmpengunjung'] ?></option>
+                      <?php
+                    }
+                  }
+                    ?>
+                    </optgroup>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="exampleInputEmail1">Total Penjualan</label>
+                      <input type="number" class="form-control" id="harga" name="harga" placeholder="Harga Produk" value= "<?php echo $d['total_penjualan'];?>">                      
+                    </div>
+                    
+                  </div><!-- /.box-body -->
+
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+
+              </div> <!-- /.row -->
+
+          
+            <!-- Tombol Bagian Bawah -->
+
+            <div class="row">
+            <!-- left column -->
+              <div class="col-md-4 col-md-offset-5">
+
+              <button type="submit" name = 'update' class="btn btn-primary">Update</button>
+              &nbsp;
+              <button type="reset" class="btn btn-success">Reset</button>
+                  
+            </form>
+                  </div><!-- /.box-body -->
+              </div><!-- /.box -->
+              </div> <!-- /.col -->
+  </div>
+    <!-- /.row (main row) -->
+</section> <!-- /.content -->
+    </div><!-- /.container -->
+</div><!-- /.content-wrapper -->
+
+
+    <?php
+    break;
+
+    // PROSES HAPUS DATA REALISASI //
+      case 'delete':
+      mysql_query("DELETE FROM tblrealisasi WHERE nopenjualan='$_GET[id]'");
+      echo "<script>window.location='home.php?pg=rls&act=view'</script>";
+      break;
+
+    }
+    ?>
